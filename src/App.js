@@ -1,6 +1,8 @@
 // src/App.js
 import React, { useState, useEffect } from "react";
 import Sidebar from "./components/Sidebar";
+import Header from "./components/Header";
+
 import StepGeneral from "./components/StepGeneral";
 import StepMatiere from "./components/StepMatiere";
 import StepProduits from "./components/StepProduits";
@@ -11,6 +13,7 @@ import StepGaz from "./components/StepGaz";
 import StepDechets from "./components/StepDechets";
 import StepTransport from "./components/StepTransport";
 import Summary from "./components/Summary";
+
 import { saveData, loadData } from "./utils/storage";
 
 const steps = [
@@ -55,21 +58,26 @@ export default function App() {
   const StepComponent = steps[currentStep].component;
 
   return (
-    <div className="app">
-      <Sidebar
-        steps={steps}
-        currentStep={currentStep}
-        onStepSelect={goTo}
-        onResetAll={resetAll} // ← bouton “Réinitialiser tout” dans la sidebar
-      />
-      <div className="form-container">
-        <StepComponent
-          data={formData}
-          setData={setFormData}
-          onNext={onNext}
-          onPrev={onPrev}
+    <>
+      {/* En-tête avec logos */}
+      <Header />
+
+      <div className="app">
+        <Sidebar
+          steps={steps}
+          currentStep={currentStep}
+          onStepSelect={goTo}
+          onResetAll={resetAll}
         />
+        <div className="form-container">
+          <StepComponent
+            data={formData}
+            setData={setFormData}
+            onNext={onNext}
+            onPrev={onPrev}
+          />
+        </div>
       </div>
-    </div>
+    </>
   );
 }

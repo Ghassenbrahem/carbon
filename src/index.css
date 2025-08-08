@@ -180,3 +180,28 @@ ul.data-list li {
   border-radius: 12px;
   padding: 16px;
 }
+/* Header / Topbar */
+.topbar{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:16px;
+  padding:10px 16px;
+  background: var(--panel);
+  color: var(--text);
+  border-bottom:1px solid var(--border);
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+.topbar .logo{
+  max-height: 48px;        /* ajuste si besoin */
+  width: auto;
+  object-fit: contain;
+}
+.topbar .brand-title{
+  flex:1;
+  text-align:center;
+  font-weight: 700;
+  letter-spacing: .3px;
+}
