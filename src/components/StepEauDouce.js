@@ -1,7 +1,9 @@
 import React, { useState } from "react";
 import facteurs from "../data/facteurs.json";
+import TotalBar from "./TotalBar";
 
-export default function StepEauDouce({ data, setData, onNext, onPrev }) {
+
+export default function StepTransport({ data, setData, onNext, onPrev, grandTotal }) {
   const [quantite, setQuantite] = useState("");
   const items = data.eaudouce || [];
 
@@ -49,6 +51,17 @@ export default function StepEauDouce({ data, setData, onNext, onPrev }) {
         <button onClick={onNext}>Suivant</button>
         <button className="btn-danger" onClick={removeAll}>Supprimer tout</button>
       </div>
+       {/* Barre totale sous les boutons */}
+            <TotalBar
+              total={grandTotal}             // total général
+              max={200}                      // ajuste l’échelle/objectif si besoin
+              year={data?.general?.annee}
+              onDetails={() => {
+                const el = document.getElementById("rapport-detaille");
+                if (el) el.scrollIntoView({ behavior: "smooth" });
+              }}
+            />
     </div>
+    
   );
 }

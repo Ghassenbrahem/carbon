@@ -3,9 +3,26 @@ import React from "react";
 import { saveAs } from "file-saver";
 import * as XLSX from "xlsx";
 import { Pie, Bar } from "react-chartjs-2";
-import { Chart as ChartJS, ArcElement, Tooltip, Legend, CategoryScale, LinearScale, BarElement } from "chart.js";
+import {
+  Chart as ChartJS,
+  ArcElement,
+  Tooltip,
+  Legend,
+  CategoryScale,
+  LinearScale,
+  BarElement,
+} from "chart.js";
+import TotalBar from "./TotalBar";
+import TotalCard from "./TotalCard";
 
-ChartJS.register(ArcElement, Tooltip, Legend, CategoryScale, LinearScale, BarElement);
+ChartJS.register(
+  ArcElement,
+  Tooltip,
+  Legend,
+  CategoryScale,
+  LinearScale,
+  BarElement
+);
 
 export default function Summary({ data, onPrev }) {
   const categories = [
@@ -16,43 +33,56 @@ export default function Summary({ data, onPrev }) {
     { id: "eaudouce", label: "Eau douce" },
     { id: "gaz", label: "Gaz" },
     { id: "dechets", label: "Déchets" },
-    { id: "transport", label: "Transport" }
+    { id: "transport", label: "Transport" },
   ];
 
-  // Calcul totaux
-  const totals = categories.map(cat => {
-    const items = data[cat.id] || [];
+  // Totaux par catégorie
+  const totals = categories.map((cat) => {
+    const items = data?.[cat.id] || [];
     const sum = items.reduce((acc, cur) => acc + Number(cur.emission || 0), 0);
-    return { label: cat.label, value: sum };
+    return { id: cat.id, label: cat.label, value: sum };
   });
 
   const totalGeneral = totals.reduce((acc, t) => acc + t.value, 0);
 
-  // Données pour graphiques
+  // Graph data
   const chartData = {
-    labels: totals.map(t => t.label),
+    labels: totals.map((t) => t.label),
     datasets: [
       {
         label: "tCO₂e",
-        data: totals.map(t => t.value),
+        data: totals.map((t) => t.value),
         backgroundColor: [
-          "#4cafef", "#ff9800", "#4caf50", "#9c27b0",
-          "#f44336", "#00bcd4", "#8bc34a", "#ff5722"
-        ]
-      }
-    ]
+          "#4cafef",
+          "#ff9800",
+          "#4caf50",
+          "#9c27b0",
+          "#f44336",
+          "#00bcd4",
+          "#8bc34a",
+          "#ff5722",
+        ],
+      },
+    ],
   };
 
-  // Export Excel
+  // Export Excel (feuille synthèse)
   const exportExcel = () => {
-    const wsData = [["Catégorie", "Émissions (tCO₂e)"], ...totals.map(t => [t.label, t.value])];
-    wsData.push(["Total général", totalGeneral]);
-
+    const wsData = [
+      ["Catégorie", "Émissions (tCO₂e)"],
+      ...totals.map((t) => [t.label, t.value]),
+      [],
+      ["Total général", totalGeneral],
+      [],
+      ["Année", data?.general?.annee || ""],
+      ["Entreprise", data?.general?.entreprise || ""],
+      ["Site", data?.general?.site || ""],
+      ["Type de produit", data?.general?.produit || ""],
+    ];
     const ws = XLSX.utils.aoa_to_sheet(wsData);
     const wb = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(wb, ws, "Bilan Carbone");
-
-    const fileName = `Bilan_Carbone_${new Date().getFullYear()}.xlsx`;
+    const fileName = `Bilan_Carbone_${data?.general?.annee || new Date().getFullYear()}.xlsx`;
     const excelBuffer = XLSX.write(wb, { bookType: "xlsx", type: "array" });
     saveAs(new Blob([excelBuffer], { type: "application/octet-stream" }), fileName);
   };
@@ -61,7 +91,23 @@ export default function Summary({ data, onPrev }) {
     <div className="step-card">
       <h2>Synthèse des émissions</h2>
 
-      <table className="data-table">
+      {/* Carte "TOTAL DES ÉMISSIONS" */}
+      <TotalCard total={totalGeneral} />
+
+      {/* Barre de progression + encart à droite */}
+      <TotalBar
+        total={totalGeneral}
+        max={200}                          // ajuste l’objectif/échelle
+        year={data?.general?.annee}
+        onDetails={() => {
+          const el = document.getElementById("rapport-detaille");
+          if (el) el.scrollIntoView({ behavior: "smooth" });
+          // ou: exportExcel();
+        }}
+      />
+
+      {/* Tableau détaillé */}
+      <table id="rapport-detaille" className="data-table">
         <thead>
           <tr>
             <th>Catégorie</th>
@@ -69,8 +115,8 @@ export default function Summary({ data, onPrev }) {
           </tr>
         </thead>
         <tbody>
-          {totals.map((t, i) => (
-            <tr key={i}>
+          {totals.map((t) => (
+            <tr key={t.id}>
               <td>{t.label}</td>
               <td>{t.value.toFixed(2)}</td>
             </tr>
@@ -82,7 +128,8 @@ export default function Summary({ data, onPrev }) {
         </tbody>
       </table>
 
-      <div className="charts-container" style={{ display: "flex", gap: "20px", marginTop: "20px" }}>
+      {/* Graphiques */}
+      <div className="charts-container" style={{ display: "flex", gap: 20, marginTop: 20 }}>
         <div style={{ flex: 1 }}>
           <h3>Répartition par catégorie</h3>
           <Pie data={chartData} />
@@ -93,7 +140,8 @@ export default function Summary({ data, onPrev }) {
         </div>
       </div>
 
-      <div className="actions" style={{ marginTop: "20px" }}>
+      {/* Actions */}
+      <div className="actions" style={{ marginTop: 20 }}>
         <button className="secondary" onClick={onPrev}>Précédent</button>
         <button className="primary" onClick={exportExcel}>Exporter en Excel</button>
       </div>

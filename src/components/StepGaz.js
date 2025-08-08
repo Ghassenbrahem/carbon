@@ -1,8 +1,11 @@
 import React, { useState } from "react";
 import facteurs from "../data/facteurs.json";
 
-export default function StepGaz({ data, setData, onNext, onPrev }) {
-  const [quantite, setQuantite] = useState("");
+import TotalBar from "./TotalBar";
+
+
+export default function StepTransport({ data, setData, onNext, onPrev, grandTotal }) {
+const [quantite, setQuantite] = useState("");
   const items = data.gaz || [];
 
   const handleAdd = (e) => {
@@ -49,6 +52,16 @@ export default function StepGaz({ data, setData, onNext, onPrev }) {
         <button onClick={onNext}>Suivant</button>
         <button className="btn-danger" onClick={removeAll}>Supprimer tout</button>
       </div>
+       {/* Barre totale sous les boutons */}
+            <TotalBar
+              total={grandTotal}             // total général
+              max={200}                      // ajuste l’échelle/objectif si besoin
+              year={data?.general?.annee}
+              onDetails={() => {
+                const el = document.getElementById("rapport-detaille");
+                if (el) el.scrollIntoView({ behavior: "smooth" });
+              }}
+            />
     </div>
   );
 }

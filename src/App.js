@@ -15,6 +15,7 @@ import StepTransport from "./components/StepTransport";
 import Summary from "./components/Summary";
 
 import { saveData, loadData } from "./utils/storage";
+import { computeTotals } from "./utils/calc";
 
 const steps = [
   { id: "general", label: "Informations générales", component: StepGeneral },
@@ -26,7 +27,7 @@ const steps = [
   { id: "gaz", label: "Gaz", component: StepGaz },
   { id: "dechets", label: "Déchets", component: StepDechets },
   { id: "transport", label: "Transport", component: StepTransport },
-  { id: "summary", label: "Synthèse", component: Summary }
+  { id: "summary", label: "Synthèse", component: Summary },
 ];
 
 const LAST_INDEX = steps.length - 1;
@@ -35,15 +36,14 @@ export default function App() {
   const [currentStep, setCurrentStep] = useState(0);
   const [formData, setFormData] = useState(() => loadData() || {});
 
+  // Totaux recalculés à chaque modification du formulaire
+  const { perCategory, grandTotal } = computeTotals(formData);
+
   useEffect(() => {
     saveData(formData);
   }, [formData]);
 
-  const goTo = (i) => {
-    const clamped = Math.max(0, Math.min(i, LAST_INDEX));
-    setCurrentStep(clamped);
-  };
-
+  const goTo = (i) => setCurrentStep(Math.max(0, Math.min(i, LAST_INDEX)));
   const onNext = () => setCurrentStep((i) => Math.min(i + 1, LAST_INDEX));
   const onPrev = () => setCurrentStep((i) => Math.max(i - 1, 0));
 
@@ -59,15 +59,15 @@ export default function App() {
 
   return (
     <>
-      {/* En-tête avec logos */}
       <Header />
-
       <div className="app">
         <Sidebar
           steps={steps}
           currentStep={currentStep}
           onStepSelect={goTo}
           onResetAll={resetAll}
+          totals={perCategory}     // badges par section
+          grandTotal={grandTotal}  // total général (bas de la sidebar)
         />
         <div className="form-container">
           <StepComponent
@@ -75,6 +75,8 @@ export default function App() {
             setData={setFormData}
             onNext={onNext}
             onPrev={onPrev}
+            sectionTotals={perCategory}
+            grandTotal={grandTotal} // ← important pour la barre en bas des pages
           />
         </div>
       </div>
