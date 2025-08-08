@@ -1,0 +1,29 @@
+{
+  "matiere": {
+    "acier": 1.9,
+    "plastique": 2.5,
+    "cuivre": 4.0
+  },
+  "produit": {
+    "produitA": 1.2,
+    "residuA": 0.5
+  },
+  "eaux": {
+    "m3": 0.4
+  },
+  "electricite": {
+    "kWh": 0.06
+  },
+  "eaudouce": {
+    "m3": 0.3
+  },
+  "gaz": {
+    "m3": 2.3
+  },
+  "dechets": {
+    "kg": 0.2
+  },
+  "transport": {
+    "km": 0.15
+  }
+}
