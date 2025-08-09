@@ -6,6 +6,7 @@ export function computeTotals(data = {}) {
     "produits",
     "distribution",       // ⬅️ nouveau
     "eaux",
+    "refroidissement",    // ⬅️ nouveau
     "electricite",
     "eaudouce",
     "gaz",

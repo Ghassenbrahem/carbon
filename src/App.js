@@ -11,6 +11,7 @@ import StepElectricite from "./components/StepElectricite";
 import StepEauDouce from "./components/StepEauDouce";
 import StepGaz from "./components/StepGaz";
 import StepDechets from "./components/StepDechets";
+import StepRefroidissement from "./components/StepRefroidissement";
 import Summary from "./components/Summary";
 
 import { saveData, loadData } from "./utils/storage";
@@ -22,8 +23,9 @@ const steps = [
   { id: "transportMatiere", label: "Transport matières premières", component: StepTransportMatiere },
   { id: "distribution", label: "Distribution", component: StepDistribution },
   { id: "eaux", label: "Eau de décharge", component: StepEaux },
+  { id: "refroidissement", label: "Refroidissement", component: StepRefroidissement },
   { id: "electricite", label: "Électricité", component: StepElectricite },
-  { id: "eaudouce", label: "Eau douce", component: StepEauDouce },
+  { id: "eaudouce", label: "Eau ", component: StepEauDouce },
   { id: "gaz", label: "Gaz", component: StepGaz },
   { id: "dechets", label: "Déchets", component: StepDechets },
   { id: "summary", label: "Synthèse", component: Summary }

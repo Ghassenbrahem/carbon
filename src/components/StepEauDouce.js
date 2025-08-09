@@ -11,7 +11,7 @@ export default function StepTransport({ data, setData, onNext, onPrev, grandTota
     e.preventDefault();
     if (!quantite) return;
     const emission = parseFloat(quantite) * (facteurs.eaudouce["m3"] || 0);
-    setData({ ...data, eaudouce: [...items, { nom: "Eau douce", quantite, emission }] });
+    setData({ ...data, eaudouce: [...items, { nom: "Eau ", quantite, emission }] });
     setQuantite("");
   };
 
@@ -21,7 +21,7 @@ export default function StepTransport({ data, setData, onNext, onPrev, grandTota
   };
 
   const removeAll = () => {
-    if (window.confirm("Supprimer toutes les lignes d’eau douce ?")) {
+    if (window.confirm("Supprimer toutes les lignes d’eau  ?")) {
       setData({ ...data, eaudouce: [] });
     }
   };

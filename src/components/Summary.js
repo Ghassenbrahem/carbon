@@ -30,8 +30,9 @@ export default function Summary({ data, onPrev }) {
   { id: "transportMatiere", label: "Transport matières premières" }, // ✅
   { id: "distribution", label: "Distribution" },                     // ✅
   { id: "eaux", label: "Eau de décharge" },
+  { id: "refroidissement", label: "Refroidissement" }, // ⬅️ nouveau
   { id: "electricite", label: "Électricité" },
-  { id: "eaudouce", label: "Eau douce" },
+  { id: "eaudouce", label: "Eau " },
   { id: "gaz", label: "Gaz" },
   { id: "dechets", label: "Déchets" }
 ];
