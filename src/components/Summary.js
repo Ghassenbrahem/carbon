@@ -25,16 +25,17 @@ ChartJS.register(
 );
 
 export default function Summary({ data, onPrev }) {
-  const categories = [
-    { id: "matiere", label: "Matières premières" },
-    { id: "produits", label: "Produits / Résidus" },
-    { id: "eaux", label: "Eau de décharge" },
-    { id: "electricite", label: "Électricité" },
-    { id: "eaudouce", label: "Eau douce" },
-    { id: "gaz", label: "Gaz" },
-    { id: "dechets", label: "Déchets" },
-    { id: "transport", label: "Transport" },
-  ];
+ const categories = [
+  { id: "matiere", label: "Matières premières" },
+  { id: "transportMatiere", label: "Transport matières premières" }, // ✅
+  { id: "distribution", label: "Distribution" },                     // ✅
+  { id: "eaux", label: "Eau de décharge" },
+  { id: "electricite", label: "Électricité" },
+  { id: "eaudouce", label: "Eau douce" },
+  { id: "gaz", label: "Gaz" },
+  { id: "dechets", label: "Déchets" }
+];
+
 
   // Totaux par catégorie
   const totals = categories.map((cat) => {

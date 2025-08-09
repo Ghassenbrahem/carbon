@@ -2,13 +2,14 @@
 export function computeTotals(data = {}) {
   const ids = [
     "matiere",
+    "transportMatiere",   // ⬅️ nouveau
     "produits",
+    "distribution",       // ⬅️ nouveau
     "eaux",
     "electricite",
     "eaudouce",
     "gaz",
-    "dechets",
-    "transport",
+    "dechets"
   ];
 
   const perCategory = {};

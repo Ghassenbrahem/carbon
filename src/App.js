@@ -2,16 +2,15 @@
 import React, { useState, useEffect } from "react";
 import Sidebar from "./components/Sidebar";
 import Header from "./components/Header";
-
+import StepTransportMatiere from "./components/StepTransportMatiere";
+import StepDistribution from "./components/StepDistribution";
 import StepGeneral from "./components/StepGeneral";
 import StepMatiere from "./components/StepMatiere";
-import StepProduits from "./components/StepProduits";
 import StepEaux from "./components/StepEaux";
 import StepElectricite from "./components/StepElectricite";
 import StepEauDouce from "./components/StepEauDouce";
 import StepGaz from "./components/StepGaz";
 import StepDechets from "./components/StepDechets";
-import StepTransport from "./components/StepTransport";
 import Summary from "./components/Summary";
 
 import { saveData, loadData } from "./utils/storage";
@@ -20,14 +19,14 @@ import { computeTotals } from "./utils/calc";
 const steps = [
   { id: "general", label: "Informations générales", component: StepGeneral },
   { id: "matiere", label: "Matières premières", component: StepMatiere },
-  { id: "produits", label: "Produits / Résidus", component: StepProduits },
+  { id: "transportMatiere", label: "Transport matières premières", component: StepTransportMatiere },
+  { id: "distribution", label: "Distribution", component: StepDistribution },
   { id: "eaux", label: "Eau de décharge", component: StepEaux },
   { id: "electricite", label: "Électricité", component: StepElectricite },
   { id: "eaudouce", label: "Eau douce", component: StepEauDouce },
   { id: "gaz", label: "Gaz", component: StepGaz },
   { id: "dechets", label: "Déchets", component: StepDechets },
-  { id: "transport", label: "Transport", component: StepTransport },
-  { id: "summary", label: "Synthèse", component: Summary },
+  { id: "summary", label: "Synthèse", component: Summary }
 ];
 
 const LAST_INDEX = steps.length - 1;

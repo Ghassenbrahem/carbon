@@ -8,22 +8,25 @@
     "produitA": 1.2,
     "residuA": 0.5
   },
-  "eaux": {
-    "m3": 0.4
+  "eaux": { "m3": 0.4 },
+  "electricite": { "kWh": 0.06 },
+  "eaudouce": { "m3": 0.3 },
+  "gaz": { "m3": 2.3 },
+  "dechets": { "kg": 0.2 },
+
+  "transport": { "km": 0.15 },
+
+  "transportMatiere": {
+    "route": 0.00015,
+    "rail": 0.00004,
+    "maritime": 0.00001,
+    "aerien": 0.00060
   },
-  "electricite": {
-    "kWh": 0.06
-  },
-  "eaudouce": {
-    "m3": 0.3
-  },
-  "gaz": {
-    "m3": 2.3
-  },
-  "dechets": {
-    "kg": 0.2
-  },
-  "transport": {
-    "km": 0.15
+
+  "distribution": {
+    "route": 0.00014,
+    "rail": 0.00003,
+    "maritime": 0.000009,
+    "aerien": 0.00055
   }
 }

@@ -34,7 +34,6 @@ export default function StepEaux({ data, setData, onNext, onPrev, grandTotal }) 
     }
   };
 
-  const totalSection = items.reduce((s, x) => s + Number(x.emission || 0), 0);
 
   return (
     <div className="step-card">
@@ -65,9 +64,7 @@ export default function StepEaux({ data, setData, onNext, onPrev, grandTotal }) 
         {items.length === 0 && <li className="muted">Aucune ligne pour l’instant.</li>}
       </ul>
 
-      <div className="muted" style={{ marginTop: 8 }}>
-        Total étape : <strong>{totalSection.toFixed(2)} tCO₂e</strong>
-      </div>
+      
 
       <div className="actions">
         <button className="secondary" onClick={onPrev}>Précédent</button>

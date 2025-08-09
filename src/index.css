@@ -364,3 +364,42 @@ textarea:focus{
   min-width: 48px;
   text-align: right;
 }
+.data-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-family: "Segoe UI", Arial, sans-serif;
+  background-color: #fff;
+  border-radius: 6px;
+  overflow: hidden;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+}
+
+.data-table thead {
+  background: linear-gradient(90deg, #1f6feb, #0d3b66);
+  color: white;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  font-size: 14px;
+}
+
+.data-table thead th {
+  padding: 12px 15px;
+  text-align: left;
+}
+
+.data-table tbody td {
+  padding: 10px 15px;
+  border-bottom: 1px solid #f0f0f0;
+  font-size: 14px;
+  color: #333;
+}
+
+.data-table tbody tr:hover {
+  background-color: #f9f9f9;
+}
+
+.data-table tbody .muted {
+  text-align: center;
+  color: #888;
+  font-style: italic;
+}
