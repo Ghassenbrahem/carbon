@@ -2,14 +2,12 @@ import React, { useState, useEffect } from "react";
 import facteurs from "../data/facteurs.json";
 
 /**
- * Émissions (tCO₂e) = Quantité (kg) × GWP × (Taux annuel / 100) / 1000
- * -> division par 1000 pour passer kgCO₂e -> tCO₂e si tu préfères rester en t
- * Si tu veux rester en kgCO₂e, retire simplement le "/ 1000".
+ * Émissions (kgCO₂e) = Quantité (kg) × GWP × (Taux annuel / 100)
  */
 export default function StepRefroidissement({ data, setData, onNext, onPrev }) {
   const items = data.refroidissement || [];
 
-  // Liste de GWP par défaut (fallback si absents dans facteurs.json)
+  // Liste GWP (fallback si absents du JSON)
   const gwpMap = {
     R134a: 1430,
     R410A: 2088,
@@ -26,7 +24,7 @@ export default function StepRefroidissement({ data, setData, onNext, onPrev }) {
     taux: "" // %/an
   });
 
-  // Auto-préremplir le GWP quand on change de type, si connu
+  // Auto-préremplir le GWP quand on change de fluide
   useEffect(() => {
     const f = gwpMap[row.type];
     if (typeof f === "number") {
@@ -54,8 +52,8 @@ export default function StepRefroidissement({ data, setData, onNext, onPrev }) {
     const g = Number(row.gwp);
     const t = Number(row.taux);
 
-    // en tCO2e : kg * gwp * (t/100) / 1000
-    const emission = (q * g * (t / 100)) / 1000;
+    // en kgCO₂e
+    const emission = q * g * (t / 100);
 
     setData(prev => ({
       ...prev,
@@ -130,7 +128,7 @@ export default function StepRefroidissement({ data, setData, onNext, onPrev }) {
             <th>Quantité (kg)</th>
             <th>GWP</th>
             <th>Taux annuel (%)</th>
-            <th>Émissions (tCO₂e)</th>
+            <th>Émissions (kgCO₂e)</th>
             <th></th>
           </tr>
         </thead>
@@ -143,7 +141,7 @@ export default function StepRefroidissement({ data, setData, onNext, onPrev }) {
               <td>{it.quantite}</td>
               <td>{it.gwp}</td>
               <td>{it.taux}</td>
-              <td>{Number(it.emission).toFixed(4)}</td>
+              <td>{Number(it.emission).toFixed(2)}</td>
               <td style={{ textAlign: "right" }}>
                 <button className="btn-danger" onClick={() => removeItem(i)}>Supprimer</button>
               </td>
@@ -154,7 +152,7 @@ export default function StepRefroidissement({ data, setData, onNext, onPrev }) {
           <tfoot>
             <tr className="total-row">
               <td colSpan={4}><strong>Total étape</strong></td>
-              <td><strong>{totalSection.toFixed(4)}</strong></td>
+              <td><strong>{totalSection.toFixed(2)}</strong></td>
               <td></td>
             </tr>
           </tfoot>
@@ -171,3 +169,4 @@ export default function StepRefroidissement({ data, setData, onNext, onPrev }) {
     </div>
   );
 }
+

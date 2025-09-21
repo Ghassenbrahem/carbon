@@ -49,7 +49,8 @@ export default function Sidebar({
 
       {typeof grandTotal === "number" && (
         <div style={{ padding: "8px 14px", fontSize: "13px", color: "var(--muted)" }}>
-          Total général : <strong>{grandTotal.toFixed(2)} tCO₂e</strong>
+     Total général : <strong>{grandTotal.toFixed(2)} kgCO₂e</strong>
+
         </div>
       )}
     </div>

@@ -93,7 +93,7 @@ export default function StepDistribution({ data, setData, onNext, onPrev }) {
             <th>Quantité (t)</th>
             <th>Km</th>
             <th>Facteur</th>
-            <th>Émissions (tCO₂e)</th>
+            <th>Émissions (kgCO₂e)</th>
             <th></th>
           </tr>
         </thead>

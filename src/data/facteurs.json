@@ -4,35 +4,67 @@
     "plastique": 2.5,
     "cuivre": 4.0
   },
+
   "produit": {
     "produitA": 1.2,
     "residuA": 0.5
   },
-  "eaux": { "m3": 0.4 },
-  "electricite": { "kWh": 0.06 },
-  "eaudouce": { "m3": 0.3 },
-  "gaz": { "m3": 2.3 },
-  "dechets": { "kg": 0.2 },
 
-  "transport": { "km": 0.15 },
+  "electricite": {
+    "kWh": 0.490
+  },
+
+  "eau": {
+    "m3": 0.344
+  },
+
+  "gaz": {
+    "m3": 23.99
+  },
+
+  "eaudouce": {
+    "Osmose inverse": 0.15,
+    "Step Step": 0.15
+  },
+
+  "dechets": {
+    "Plastique": 0.45,
+    "Métal": 0.30,
+    "Papier": 0.10
+  },
+
+  "transport": {
+    "km": 0.15
+  },
 
   "transportMatiere": {
-    "route": 0.00015,
+    "route": 0.028,
     "rail": 0.00004,
-    "maritime": 0.00001,
-    "aerien": 0.00060
+    "maritime": 0.048,
+    "aerien": 0.097
   },
- "gwp": {
+
+  "gwp": {
     "R134a": 1430,
     "R410A": 2088,
     "R32": 675,
     "R744_CO2": 1,
     "R1234yf": 4
   },
+
   "distribution": {
-    "route": 0.00014,
-    "rail": 0.00003,
-    "maritime": 0.000009,
-    "aerien": 0.00055
-  }
+    "route": 0.028,
+    "rail": 0.00004,
+    "maritime": 0.048,
+    "aerien": 0.097
+  },
+  "refroidissement": {
+  "R22": 1760,
+  "R134a": 1430,
+  "R410A": 2088,
+  "R404A": 3922,
+  "R32": 675
 }
+
+}
+

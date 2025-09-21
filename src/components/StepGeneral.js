@@ -21,7 +21,7 @@ export default function StepGeneral({ data, setData, onNext }) {
 
   const errors = {
     annee: validateYear(infos.annee),
-    produit: !String(infos.produit || "").trim() ? "Obligatoire." : "",
+
     entreprise: !String(infos.entreprise || "").trim() ? "Obligatoire." : "",
     site: !String(infos.site || "").trim() ? "Obligatoire." : "",
     volume: !String(infos.volume || "").trim() ? "Obligatoire." : ""
@@ -43,7 +43,7 @@ export default function StepGeneral({ data, setData, onNext }) {
   const handleBlur = (e) => setTouched((p) => ({ ...p, [e.target.name]: true }));
 
   const markAllTouched = () => {
-    const t = {}; ["annee","produit","entreprise","site","volume"].forEach((k)=>t[k]=true);
+    const t = {}; ["annee","entreprise","site","volume"].forEach((k)=>t[k]=true);
     setTouched(t);
   };
 
@@ -122,16 +122,7 @@ export default function StepGeneral({ data, setData, onNext }) {
       />
       {invalid("annee") && <div className="error">{errors.annee}</div>}
 
-      <input
-        name="produit"
-        placeholder="Type de produit/projet"
-        value={infos.produit || ""}
-        onChange={handleChange}
-        onBlur={handleBlur}
-        className={invalid("produit") ? "invalid" : ""}
-      />
-      {invalid("produit") && <div className="error">{errors.produit}</div>}
-
+   
       <input
         name="entreprise"
         placeholder="Nom de l’entreprise"
@@ -165,11 +156,10 @@ export default function StepGeneral({ data, setData, onNext }) {
       {/* --- Nouveau : Type de pneu --- */}
       <select name="typePneu" value={infos.typePneu || ""} onChange={handleChange}>
         <option value="">Type de pneu (optionnel)</option>
-        <option value="tourisme">Tourisme</option>
-        <option value="camion">Camion</option>
-        <option value="agricole">Agricole</option>
-        <option value="industriel">Industriel</option>
-        <option value="2-roues">2-roues</option>
+        <option value="tourisme">Pneus tourisme</option>
+        <option value="camion">Pneus camions légers</option>
+        <option value="agricole">Pneus poids lourd (All steel)</option>
+        <option value="industriel">Pneus poids lourd (Radial textile)</option>
         <option value="autre">Autre</option>
       </select>
 

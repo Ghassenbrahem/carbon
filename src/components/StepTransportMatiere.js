@@ -2,32 +2,36 @@ import React, { useState } from "react";
 import facteurs from "../data/facteurs.json";
 
 export default function StepTransportMatiere({ data, setData, onNext, onPrev }) {
-  const [quantite, setQuantite] = useState("");
-  const [km, setKm] = useState("");
-  const [mode, setMode] = useState("route");
+  const [row, setRow] = useState({
+    nom: "",
+    quantite: "",
+    pays: "",
+    km: "",
+    mode: "route"
+  });
 
-  // On lit depuis formData global
   const items = data.transportMatiere || [];
 
   const handleAdd = (e) => {
     e.preventDefault();
-    if (!quantite || !km) return;
+    if (!row.nom || !row.quantite || !row.km) return;
 
-    const facteur = facteurs.transportMatiere[mode] || 0;
-    const emission = parseFloat(quantite) * parseFloat(km) * facteur;
+    const q = parseFloat(row.quantite);
+    const km = parseFloat(row.km);
+    const facteur = facteurs.transportMatiere[row.mode] || 0;
 
-    // On met à jour le formData global
+    // Émissions en kgCO₂e
+    const emission = q * km * facteur;
+
     setData(prev => ({
       ...prev,
       transportMatiere: [
         ...(prev.transportMatiere || []),
-        { quantite, km, mode, facteur, emission }
+        { ...row, facteur, emission }
       ]
     }));
 
-    setQuantite("");
-    setKm("");
-    setMode("route");
+    setRow({ nom: "", quantite: "", pays: "", km: "", mode: "route" });
   };
 
   const removeItem = (i) => {
@@ -41,37 +45,59 @@ export default function StepTransportMatiere({ data, setData, onNext, onPrev }) 
   return (
     <div className="step-card">
       <h2>Transport Matières Premières</h2>
-      <form onSubmit={handleAdd} className="grid-form">
+
+      {/* Formulaire */}
+      <form onSubmit={handleAdd} className="grid-form" style={{ gap: 8 }}>
         <input
-          type="number"
-          step="any"
-          placeholder="Quantité transportée (t)"
-          value={quantite}
-          onChange={(e) => setQuantite(e.target.value)}
+          type="text"
+          placeholder="Nom de l’article"
+          value={row.nom}
+          onChange={(e) => setRow({ ...row, nom: e.target.value })}
         />
         <input
           type="number"
           step="any"
-          placeholder="Kilométrage (km)"
-          value={km}
-          onChange={(e) => setKm(e.target.value)}
+          placeholder="Quantité (t)"
+          value={row.quantite}
+          onChange={(e) => setRow({ ...row, quantite: e.target.value })}
         />
-        <select value={mode} onChange={(e) => setMode(e.target.value)}>
-          <option value="route">Route</option>
-          <option value="rail">Rail</option>
-          <option value="maritime">Maritime</option>
-          <option value="aerien">Aérien</option>
+        <input
+          type="text"
+          placeholder="Pays"
+          value={row.pays}
+          onChange={(e) => setRow({ ...row, pays: e.target.value })}
+        />
+        <input
+          type="number"
+          step="any"
+          placeholder="Distance (km)"
+          value={row.km}
+          onChange={(e) => setRow({ ...row, km: e.target.value })}
+        />
+        <select
+          value={row.mode}
+          onChange={(e) => setRow({ ...row, mode: e.target.value })}
+        >
+          {Object.keys(facteurs.transportMatiere).map((k) => (
+            <option key={k} value={k}>
+              {k}
+            </option>
+          ))}
         </select>
         <button type="submit">Ajouter</button>
       </form>
 
-      <table className="data-table">
+      {/* Tableau */}
+      <table className="data-table" style={{ marginTop: 12 }}>
         <thead>
           <tr>
+            <th>Nom</th>
             <th>Quantité (t)</th>
+            <th>Pays</th>
             <th>Km</th>
             <th>Mode</th>
             <th>Facteur</th>
+            <th>Émissions (kgCO₂e)</th>
             <th></th>
           </tr>
         </thead>
@@ -79,10 +105,13 @@ export default function StepTransportMatiere({ data, setData, onNext, onPrev }) 
           {items.length > 0 ? (
             items.map((item, i) => (
               <tr key={i}>
+                <td>{item.nom}</td>
                 <td>{item.quantite}</td>
+                <td>{item.pays}</td>
                 <td>{item.km}</td>
                 <td>{item.mode}</td>
                 <td>{item.facteur}</td>
+                <td>{item.emission.toFixed(2)}</td>
                 <td>
                   <button className="btn-danger" onClick={() => removeItem(i)}>
                     Supprimer
@@ -92,7 +121,7 @@ export default function StepTransportMatiere({ data, setData, onNext, onPrev }) 
             ))
           ) : (
             <tr>
-              <td colSpan="6" className="muted">
+              <td colSpan="8" className="muted">
                 Aucun transport enregistré.
               </td>
             </tr>
@@ -100,6 +129,7 @@ export default function StepTransportMatiere({ data, setData, onNext, onPrev }) 
         </tbody>
       </table>
 
+      {/* Navigation */}
       <div className="actions">
         <button className="secondary" onClick={onPrev}>
           Précédent
@@ -109,3 +139,4 @@ export default function StepTransportMatiere({ data, setData, onNext, onPrev }) 
     </div>
   );
 }
+

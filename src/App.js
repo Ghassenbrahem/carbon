@@ -21,13 +21,13 @@ const steps = [
   { id: "general", label: "Informations générales", component: StepGeneral },
   { id: "matiere", label: "Matières premières", component: StepMatiere },
   { id: "transportMatiere", label: "Transport matières premières", component: StepTransportMatiere },
-  { id: "distribution", label: "Distribution", component: StepDistribution },
-  { id: "eaux", label: "Eau de décharge", component: StepEaux },
-  { id: "refroidissement", label: "Refroidissement", component: StepRefroidissement },
   { id: "electricite", label: "Électricité", component: StepElectricite },
   { id: "eaudouce", label: "Eau ", component: StepEauDouce },
   { id: "gaz", label: "Gaz", component: StepGaz },
+  { id: "eaux", label: "Eau de décharge", component: StepEaux },
+  { id: "distribution", label: "Distribution", component: StepDistribution },
   { id: "dechets", label: "Déchets", component: StepDechets },
+  { id: "refroidissement", label: "Refroidissement", component: StepRefroidissement },
   { id: "summary", label: "Synthèse", component: Summary }
 ];
 

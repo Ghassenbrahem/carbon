@@ -39,7 +39,7 @@ export default function StepTransport({ data, setData, onNext, onPrev, grandTota
         {items.map((e,i)=>(
           <li key={i} className="row-actions">
             <span>{e.nom} — {e.quantite} kWh</span>
-            <span className="muted">{Number(e.emission).toFixed(2)} tCO₂e</span>
+            <span className="muted">{Number(e.emission).toFixed(2)} kgCO₂e</span>
             <button className="btn-danger" onClick={()=>removeItem(i)}>Supprimer</button>
           </li>
         ))}
