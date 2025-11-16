@@ -2,45 +2,40 @@ import React, { useState, useEffect } from "react";
 import facteurs from "../data/facteurs.json";
 
 /**
- * Émissions (kgCO₂e) = Quantité (kg) × GWP × (Taux annuel / 100)
+ * Nouvelle formule :
+ *   Émissions (kgCO₂e) = Quantité (kg) × GWP
  */
 export default function StepRefroidissement({ data, setData, onNext, onPrev }) {
   const items = data.refroidissement || [];
 
-  // Liste GWP (fallback si absents du JSON)
+  // Map GWP depuis JSON
   const gwpMap = {
     R134a: 1430,
+    R404A: 3922,
     R410A: 2088,
+    R22: 1760,
     R32: 675,
-    R744_CO2: 1,
-    R1234yf: 4,
-    ...(facteurs.gwp || {})
+    ...(facteurs.refroidissement || {})
   };
 
   const [row, setRow] = useState({
-    type: "R410A",
+    type: "R404A",
     quantite: "",
-    gwp: gwpMap["R410A"] || 2088,
-    taux: "" // %/an
+    gwp: gwpMap["R404A"] || 3922
   });
 
-  // Auto-préremplir le GWP quand on change de fluide
+  // Auto-GWP quand le fluide change
   useEffect(() => {
-    const f = gwpMap[row.type];
-    if (typeof f === "number") {
-      setRow(r => ({ ...r, gwp: f }));
+    const val = gwpMap[row.type];
+    if (val) {
+      setRow((r) => ({ ...r, gwp: val }));
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [row.type]);
 
   const verify = () => {
-    const q = Number(row.quantite);
-    const g = Number(row.gwp);
-    const t = Number(row.taux);
     if (!row.type) return alert("Type requis.");
-    if (!q || q <= 0) return alert("Quantité (kg) > 0 requise.");
-    if (!g || g <= 0) return alert("GWP > 0 requis.");
-    if (!t || t <= 0) return alert("Taux annuel (%) > 0 requis.");
+    if (!Number(row.quantite)) return alert("Quantité (kg) requise.");
+    if (!Number(row.gwp)) return alert("GWP invalide.");
     return true;
   };
 
@@ -50,24 +45,22 @@ export default function StepRefroidissement({ data, setData, onNext, onPrev }) {
 
     const q = Number(row.quantite);
     const g = Number(row.gwp);
-    const t = Number(row.taux);
 
-    // en kgCO₂e
-    const emission = q * g * (t / 100);
+    const emission = q * g; // ⚡ Plus de taux annuel
 
-    setData(prev => ({
+    setData((prev) => ({
       ...prev,
       refroidissement: [
         ...(prev.refroidissement || []),
-        { type: row.type, quantite: q, gwp: g, taux: t, emission }
+        { type: row.type, quantite: q, gwp: g, emission }
       ]
     }));
 
-    setRow(r => ({ ...r, quantite: "", taux: "" }));
+    setRow((r) => ({ ...r, quantite: "" }));
   };
 
   const removeItem = (i) => {
-    setData(prev => {
+    setData((prev) => {
       const updated = [...(prev.refroidissement || [])];
       updated.splice(i, 1);
       return { ...prev, refroidissement: updated };
@@ -75,11 +68,11 @@ export default function StepRefroidissement({ data, setData, onNext, onPrev }) {
   };
 
   const removeAll = () => {
-    if (!window.confirm("Supprimer toutes les lignes de refroidissement ?")) return;
-    setData(prev => ({ ...prev, refroidissement: [] }));
+    if (!window.confirm("Supprimer toutes les lignes ?")) return;
+    setData((prev) => ({ ...prev, refroidissement: [] }));
   };
 
-  const totalSection = items.reduce((s, x) => s + Number(x.emission || 0), 0);
+  const totalSection = items.reduce((s, x) => s + Number(x.emission), 0);
 
   return (
     <div className="step-card">
@@ -89,10 +82,9 @@ export default function StepRefroidissement({ data, setData, onNext, onPrev }) {
         <select
           value={row.type}
           onChange={(e) => setRow({ ...row, type: e.target.value })}
-          title="Type de fluide frigorigène"
         >
-          {Object.keys(gwpMap).map(k => (
-            <option key={k} value={k}>{k}</option>
+          {Object.keys(gwpMap).map((f) => (
+            <option key={f} value={f}>{f}</option>
           ))}
         </select>
 
@@ -103,19 +95,13 @@ export default function StepRefroidissement({ data, setData, onNext, onPrev }) {
           value={row.quantite}
           onChange={(e) => setRow({ ...row, quantite: e.target.value })}
         />
+
         <input
           type="number"
           step="any"
           placeholder="GWP"
           value={row.gwp}
           onChange={(e) => setRow({ ...row, gwp: e.target.value })}
-        />
-        <input
-          type="number"
-          step="any"
-          placeholder="Taux annuel (%)"
-          value={row.taux}
-          onChange={(e) => setRow({ ...row, taux: e.target.value })}
         />
 
         <button type="submit">Ajouter</button>
@@ -127,31 +113,37 @@ export default function StepRefroidissement({ data, setData, onNext, onPrev }) {
             <th>Type</th>
             <th>Quantité (kg)</th>
             <th>GWP</th>
-            <th>Taux annuel (%)</th>
             <th>Émissions (kgCO₂e)</th>
             <th></th>
           </tr>
         </thead>
+
         <tbody>
           {items.length === 0 ? (
-            <tr><td colSpan={6} className="muted">Aucune ligne pour l’instant.</td></tr>
-          ) : items.map((it, i) => (
-            <tr key={i}>
-              <td>{it.type}</td>
-              <td>{it.quantite}</td>
-              <td>{it.gwp}</td>
-              <td>{it.taux}</td>
-              <td>{Number(it.emission).toFixed(2)}</td>
-              <td style={{ textAlign: "right" }}>
-                <button className="btn-danger" onClick={() => removeItem(i)}>Supprimer</button>
-              </td>
+            <tr>
+              <td colSpan={5} className="muted">Aucune ligne pour l’instant.</td>
             </tr>
-          ))}
+          ) : (
+            items.map((it, i) => (
+              <tr key={i}>
+                <td>{it.type}</td>
+                <td>{it.quantite}</td>
+                <td>{it.gwp}</td>
+                <td>{it.emission.toFixed(2)}</td>
+                <td>
+                  <button className="btn-danger" onClick={() => removeItem(i)}>
+                    Supprimer
+                  </button>
+                </td>
+              </tr>
+            ))
+          )}
         </tbody>
+
         {items.length > 0 && (
           <tfoot>
             <tr className="total-row">
-              <td colSpan={4}><strong>Total étape</strong></td>
+              <td colSpan={3}><strong>Total étape</strong></td>
               <td><strong>{totalSection.toFixed(2)}</strong></td>
               <td></td>
             </tr>
@@ -169,4 +161,3 @@ export default function StepRefroidissement({ data, setData, onNext, onPrev }) {
     </div>
   );
 }
-

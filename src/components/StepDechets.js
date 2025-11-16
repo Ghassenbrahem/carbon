@@ -1,18 +1,26 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import facteurs from "../data/facteurs.json";
 import TotalBar from "./TotalBar";
 
 export default function StepDechets({ data, setData, onNext, onPrev, grandTotal }) {
-  const [nom, setNom] = useState("");          // type de déchet choisi
-  const [quantite, setQuantite] = useState(""); 
+  const [nom, setNom] = useState("");            // type de déchet écrit manuellement
+  const [quantite, setQuantite] = useState("");  // quantité
+  const [facteur, setFacteur] = useState("");    // facteur (auto si connu, sinon manuel)
+
   const items = data.dechets || [];
+
+  // 🔥 Mise à jour automatique du facteur si le nom existe dans facteurs.json
+  useEffect(() => {
+    if (facteurs.dechets[nom]) {
+      setFacteur(facteurs.dechets[nom]);  // auto
+    }
+  }, [nom]);
 
   const handleAdd = (e) => {
     e.preventDefault();
-    if (!nom || !quantite) return;
+    if (!nom || !quantite || !facteur) return;
 
-    const facteur = facteurs.dechets[nom] || 0;  // récupère le facteur du JSON
-    const emission = parseFloat(quantite) * facteur;
+    const emission = parseFloat(quantite) * parseFloat(facteur);
 
     setData({
       ...data,
@@ -21,6 +29,7 @@ export default function StepDechets({ data, setData, onNext, onPrev, grandTotal 
 
     setNom("");
     setQuantite("");
+    setFacteur("");
   };
 
   const removeItem = (i) => {
@@ -40,13 +49,17 @@ export default function StepDechets({ data, setData, onNext, onPrev, grandTotal 
       <h2>Déchets</h2>
 
       {/* Formulaire */}
-      <form onSubmit={handleAdd}>
-        <select value={nom} onChange={(e) => setNom(e.target.value)}>
-          <option value="">-- Choisir un type --</option>
-          {Object.keys(facteurs.dechets).map((key) => (
-            <option key={key} value={key}>{key}</option>
-          ))}
-        </select>
+      <form onSubmit={handleAdd} className="grid-form" style={{ gap: 8 }}>
+
+        {/* 🔵 type manuel */}
+        <input
+          type="text"
+          placeholder="Type de déchet (ex : Plastique, Métal, Carton...)"
+          value={nom}
+          onChange={(e) => setNom(e.target.value)}
+        />
+
+        {/* 🔵 quantité */}
         <input
           type="number"
           step="any"
@@ -54,20 +67,31 @@ export default function StepDechets({ data, setData, onNext, onPrev, grandTotal 
           value={quantite}
           onChange={(e) => setQuantite(e.target.value)}
         />
+
+        {/* 🔵 facteur (auto si connu, sinon modifiable) */}
+        <input
+          type="number"
+          step="any"
+          placeholder="Facteur (kgCO₂e/kg)"
+          value={facteur}
+          onChange={(e) => setFacteur(e.target.value)}
+        />
+
         <button type="submit">Ajouter</button>
       </form>
 
-      {/* Tableau style Excel */}
+      {/* Tableau type Excel */}
       <table className="data-table">
         <thead>
           <tr>
-            <th>Nom</th>
+            <th>Type</th>
             <th>Quantité (kg)</th>
-            <th>Facteur (kgCO₂e/kg)</th>
+            <th>Facteur</th>
             <th>Émissions (kgCO₂e)</th>
             <th></th>
           </tr>
         </thead>
+
         <tbody>
           {items.length === 0 ? (
             <tr>
@@ -91,7 +115,7 @@ export default function StepDechets({ data, setData, onNext, onPrev, grandTotal 
         </tbody>
       </table>
 
-      {/* Boutons navigation + barre totale */}
+      {/* Navigation */}
       <div className="actions">
         <button className="secondary" onClick={onPrev}>Précédent</button>
         <button onClick={onNext}>Suivant</button>
@@ -99,7 +123,7 @@ export default function StepDechets({ data, setData, onNext, onPrev, grandTotal 
       </div>
 
       <TotalBar
-        total={grandTotal}   // total général
+        total={grandTotal}
         max={200}
         year={data?.general?.annee}
         onDetails={() => {
@@ -110,4 +134,3 @@ export default function StepDechets({ data, setData, onNext, onPrev, grandTotal 
     </div>
   );
 }
-

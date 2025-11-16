@@ -145,7 +145,7 @@ export default function StepGeneral({ data, setData, onNext }) {
 
       <input
         name="volume"
-        placeholder="Volume de production"
+        placeholder="Volume de production en Kg"
         value={infos.volume || ""}
         onChange={handleChange}
         onBlur={handleBlur}

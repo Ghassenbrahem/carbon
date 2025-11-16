@@ -1,84 +1,99 @@
-// src/components/StepDistribution.js
 import React, { useState, useEffect } from "react";
 import facteurs from "../data/facteurs.json";
 
 export default function StepDistribution({ data, setData, onNext, onPrev }) {
-  const [type, setType] = useState("route"); // channel / type
-  const [quantite, setQuantite] = useState(""); // q-distru
+
+  const [canal, setCanal] = useState("");
+  const [type, setType] = useState("routier");  // valeur par défaut corrigée
+  const [quantite, setQuantite] = useState("");
   const [km, setKm] = useState("");
-  const [facteur, setFacteur] = useState(facteurs.distribution?.route || 0);
+
+  // FACTEUR AUTO
+  const [facteur, setFacteur] = useState(facteurs.distribution.routier);
 
   const items = data.distribution || [];
 
-  // si l’utilisateur change le type, on pré-remplit le facteur si connu
+  // 🔥 mise à jour auto du facteur quand le type change
   useEffect(() => {
-    const f = facteurs.distribution?.[type];
+    const f = facteurs.distribution[type];
     if (typeof f === "number") setFacteur(f);
   }, [type]);
 
   const handleAdd = (e) => {
     e.preventDefault();
-    if (!type || !quantite || !km || facteur === "" || isNaN(facteur)) return;
+    if (!canal || !type || !quantite || !km) return;
 
-    const qNum = parseFloat(quantite);
-    const kmNum = parseFloat(km);
-    const fNum = parseFloat(facteur);
+    const q = parseFloat(quantite);
+    const k = parseFloat(km);
+    const f = parseFloat(facteur);
 
-    const emission = fNum * kmNum * qNum;
+    const emission = q * k * f;
 
     setData(prev => ({
       ...prev,
       distribution: [
         ...(prev.distribution || []),
-        { type, quantite: qNum, km: kmNum, facteur: fNum, emission }
+        { canal, type, quantite: q, km: k, facteur: f, emission }
       ]
     }));
 
-    // reset inputs (on garde le type)
+    setCanal("");
     setQuantite("");
     setKm("");
   };
 
   const removeItem = (i) => {
     setData(prev => {
-      const updated = [...(prev.distribution || [])];
-      updated.splice(i, 1);
-      return { ...prev, distribution: updated };
+      const copy = [...prev.distribution];
+      copy.splice(i, 1);
+      return { ...prev, distribution: copy };
     });
   };
-
 
   return (
     <div className="step-card">
       <h2>Distribution</h2>
 
       <form onSubmit={handleAdd} className="grid-form" style={{ gap: 8 }}>
+
+        {/* CANAL */}
+        <input
+          type="text"
+          placeholder="Canal (ex : Export, Local...)"
+          value={canal}
+          onChange={(e) => setCanal(e.target.value)}
+        />
+
+        {/* TYPE */}
         <select value={type} onChange={(e) => setType(e.target.value)}>
-          <option value="route">Route</option>
-          <option value="rail">Rail</option>
+          <option value="routier">Routier</option>
           <option value="maritime">Maritime</option>
           <option value="aerien">Aérien</option>
-          {/* ajoute ici d'autres "channels" si besoin */}
         </select>
 
+        {/* QUANTITÉ */}
         <input
           type="number"
           step="any"
-          placeholder="Quantité distribuée (t)"
+          placeholder="Quantité (t)"
           value={quantite}
           onChange={(e) => setQuantite(e.target.value)}
         />
+
+        {/* KM */}
         <input
           type="number"
           step="any"
-          placeholder="Kilométrage (km)"
+          placeholder="Distance (km)"
           value={km}
           onChange={(e) => setKm(e.target.value)}
         />
+
+        {/* FACTEUR auto-rempli */}
         <input
           type="number"
           step="any"
-          placeholder="Facteur (tCO₂e / t·km)"
+          placeholder="Facteur (tCO₂e/t·km)"
           value={facteur}
           onChange={(e) => setFacteur(e.target.value)}
         />
@@ -89,18 +104,21 @@ export default function StepDistribution({ data, setData, onNext, onPrev }) {
       <table className="data-table" style={{ marginTop: 12 }}>
         <thead>
           <tr>
+            <th>Canal</th>
             <th>Type</th>
-            <th>Quantité (t)</th>
+            <th>Quantité</th>
             <th>Km</th>
             <th>Facteur</th>
-            <th>Émissions (kgCO₂e)</th>
+            <th>Émissions</th>
             <th></th>
           </tr>
         </thead>
+
         <tbody>
           {items.length > 0 ? (
             items.map((item, i) => (
               <tr key={i}>
+                <td>{item.canal}</td>
                 <td>{item.type}</td>
                 <td>{item.quantite}</td>
                 <td>{item.km}</td>
@@ -114,18 +132,9 @@ export default function StepDistribution({ data, setData, onNext, onPrev }) {
               </tr>
             ))
           ) : (
-            <tr>
-              <td colSpan="6" className="muted">Aucune distribution enregistrée.</td>
-            </tr>
+            <tr><td colSpan="7" className="muted">Aucune distribution enregistrée.</td></tr>
           )}
         </tbody>
-        {items.length > 0 && (
-          <tfoot>
-            <tr className="total-row">
-              <td></td>
-            </tr>
-          </tfoot>
-        )}
       </table>
 
       <div className="actions">

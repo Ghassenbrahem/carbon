@@ -2,21 +2,23 @@ import React, { useState } from "react";
 import facteurs from "../data/facteurs.json";
 import TotalBar from "./TotalBar";
 
-export default function StepEauDouce({ data, setData, onNext, onPrev, grandTotal }) {
+export default function StepEauDecharge({ data, setData, onNext, onPrev, grandTotal }) {
   const [quantite, setQuantite] = useState("");
-  const [type, setType] = useState("Osmose inverse");  // valeur par défaut
-  const items = data.eaudouce || [];
+  const [type, setType] = useState("Step"); // valeur par défaut
+
+  // ⚠️ IMPORTANT : data.eau (et pas eaudouce)
+  const items = data.eau || [];
 
   const handleAdd = (e) => {
     e.preventDefault();
     if (!quantite) return;
 
-    const facteur = facteurs.eaudouce[type] || 0;
+    const facteur = facteurs.eau[type] || 0;
     const emission = parseFloat(quantite) * facteur;
 
     setData({
       ...data,
-      eaudouce: [...items, { nom: type, quantite, facteur, emission }]
+      eau: [...items, { nom: type, quantite, facteur, emission }]
     });
 
     setQuantite("");
@@ -25,24 +27,30 @@ export default function StepEauDouce({ data, setData, onNext, onPrev, grandTotal
   const removeItem = (i) => {
     const updated = [...items];
     updated.splice(i, 1);
-    setData({ ...data, eaudouce: updated });
+
+    setData({
+      ...data,
+      eau: updated
+    });
   };
 
   const removeAll = () => {
     if (window.confirm("Supprimer toutes les lignes d’eau ?")) {
-      setData({ ...data, eaudouce: [] });
+      setData({ ...data, eau: [] });
     }
   };
 
   return (
     <div className="step-card">
-      <h2>Eau douce</h2>
+      <h2>Eau de décharge</h2>
 
       <form onSubmit={handleAdd}>
-        {/* Choix du type */}
+        {/* Choix du type (Step) */}
         <select value={type} onChange={(e) => setType(e.target.value)}>
-          {Object.keys(facteurs.eaudouce).map((t, i) => (
-            <option key={i} value={t}>{t}</option>
+          {Object.keys(facteurs.eau).map((t, i) => (
+            <option key={i} value={t}>
+              {t}
+            </option>
           ))}
         </select>
 
@@ -62,21 +70,27 @@ export default function StepEauDouce({ data, setData, onNext, onPrev, grandTotal
       <ul className="data-list">
         {items.map((e, i) => (
           <li key={i} className="row-actions">
-            <span>{e.nom} — {e.quantite} m³ × {e.facteur} = {Number(e.emission).toFixed(2)} kgCO₂e</span>
-            <button className="btn-danger" onClick={() => removeItem(i)}>Supprimer</button>
+            <span>
+              {e.nom} — {e.quantite} m³ × {e.facteur} ={" "}
+              {Number(e.emission).toFixed(3)} kgCO₂e
+            </span>
+            <button className="btn-danger" onClick={() => removeItem(i)}>
+              Supprimer
+            </button>
           </li>
         ))}
-        {items.length === 0 && <li className="muted">Aucune ligne pour l’instant.</li>}
+
+        {items.length === 0 && (
+          <li className="muted">Aucune ligne pour l’instant.</li>
+        )}
       </ul>
 
-      {/* Actions */}
       <div className="actions">
         <button className="secondary" onClick={onPrev}>Précédent</button>
         <button onClick={onNext}>Suivant</button>
         <button className="btn-danger" onClick={removeAll}>Supprimer tout</button>
       </div>
 
-      {/* Barre totale */}
       <TotalBar
         total={grandTotal}
         max={200}
@@ -89,4 +103,3 @@ export default function StepEauDouce({ data, setData, onNext, onPrev, grandTotal
     </div>
   );
 }
-

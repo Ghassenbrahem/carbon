@@ -15,17 +15,18 @@
   },
 
   "eau": {
-    "m3": 0.344
+    "Step": 2.54
+  
+  },
+   "eaudouce": {
+    "m3": 0.355
   },
 
-  "gaz": {
-    "m3": 23.99
-  },
+"gaz": {
+    "Tep": 2447
+},
 
-  "eaudouce": {
-    "Osmose inverse": 0.15,
-    "Step Step": 0.15
-  },
+
 
   "dechets": {
     "Plastique": 0.45,
@@ -37,33 +38,29 @@
     "km": 0.15
   },
 
-  "transportMatiere": {
-    "route": 0.028,
-    "rail": 0.00004,
-    "maritime": 0.048,
-    "aerien": 0.097
-  },
+  
 
   "gwp": {
     "R134a": 1430,
-    "R410A": 2088,
-    "R32": 675,
-    "R744_CO2": 1,
-    "R1234yf": 4
+    "R404A": 3922,
+    "R22": 1810
   },
 
+
+  "transportMatiere": {
+  "routier": 0.078,
+  "maritime": 0.048,
+  "aerien": 0.578
+},
   "distribution": {
-    "route": 0.028,
-    "rail": 0.00004,
+    "routier": 0.078,
     "maritime": 0.048,
-    "aerien": 0.097
+    "aerien": 0.578
   },
   "refroidissement": {
-  "R22": 1760,
+  "R22": 1810,
   "R134a": 1430,
-  "R410A": 2088,
-  "R404A": 3922,
-  "R32": 675
+  "R404A": 3922
 }
 
 }
