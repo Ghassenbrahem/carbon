@@ -1,14 +1,9 @@
 import React, { useState, useEffect } from "react";
 import facteurs from "../data/facteurs.json";
 
-/**
- * Nouvelle formule :
- *   Émissions (kgCO₂e) = Quantité (kg) × GWP
- */
 export default function StepRefroidissement({ data, setData, onNext, onPrev }) {
   const items = data.refroidissement || [];
 
-  // Map GWP depuis JSON
   const gwpMap = {
     R134a: 1430,
     R404A: 3922,
@@ -24,29 +19,18 @@ export default function StepRefroidissement({ data, setData, onNext, onPrev }) {
     gwp: gwpMap["R404A"] || 3922
   });
 
-  // Auto-GWP quand le fluide change
   useEffect(() => {
     const val = gwpMap[row.type];
-    if (val) {
-      setRow((r) => ({ ...r, gwp: val }));
-    }
+    if (val) setRow((r) => ({ ...r, gwp: val }));
   }, [row.type]);
-
-  const verify = () => {
-    if (!row.type) return alert("Type requis.");
-    if (!Number(row.quantite)) return alert("Quantité (kg) requise.");
-    if (!Number(row.gwp)) return alert("GWP invalide.");
-    return true;
-  };
 
   const handleAdd = (e) => {
     e.preventDefault();
-    if (!verify()) return;
+    if (!row.type || !row.quantite || !row.gwp) return;
 
     const q = Number(row.quantite);
     const g = Number(row.gwp);
-
-    const emission = q * g; // ⚡ Plus de taux annuel
+    const emission = q * g;
 
     setData((prev) => ({
       ...prev,
@@ -60,78 +44,151 @@ export default function StepRefroidissement({ data, setData, onNext, onPrev }) {
   };
 
   const removeItem = (i) => {
-    setData((prev) => {
-      const updated = [...(prev.refroidissement || [])];
-      updated.splice(i, 1);
-      return { ...prev, refroidissement: updated };
-    });
+    const updated = [...items];
+    updated.splice(i, 1);
+    setData((prev) => ({
+      ...prev,
+      refroidissement: updated
+    }));
   };
 
   const removeAll = () => {
-    if (!window.confirm("Supprimer toutes les lignes ?")) return;
-    setData((prev) => ({ ...prev, refroidissement: [] }));
+    if (window.confirm("Supprimer toutes les lignes ?")) {
+      setData((prev) => ({ ...prev, refroidissement: [] }));
+    }
   };
 
   const totalSection = items.reduce((s, x) => s + Number(x.emission), 0);
 
   return (
-    <div className="step-card">
-      <h2>Émissions – Systèmes de refroidissement</h2>
+    <div style={{ padding: 20 }}>
+      <h2 style={{ marginBottom: 20 }}>Émissions – Systèmes de refroidissement</h2>
 
-      <form onSubmit={handleAdd} className="grid-form" style={{ gap: 8 }}>
+      {/* FORMULAIRE */}
+      <form
+        onSubmit={handleAdd}
+        style={{
+          display: "flex",
+          gap: 10,
+          marginBottom: 20
+        }}
+      >
+        {/* Select */}
         <select
           value={row.type}
           onChange={(e) => setRow({ ...row, type: e.target.value })}
+          style={{
+            padding: "10px 15px",
+            borderRadius: 8,
+            border: "1px solid #d0d0d0",
+            background: "#f1f5f9",
+            flex: 1
+          }}
         >
           {Object.keys(gwpMap).map((f) => (
             <option key={f} value={f}>{f}</option>
           ))}
         </select>
 
+        {/* Quantité */}
         <input
           type="number"
-          step="any"
           placeholder="Quantité (kg)"
           value={row.quantite}
           onChange={(e) => setRow({ ...row, quantite: e.target.value })}
+          style={{
+            padding: "10px 15px",
+            borderRadius: 8,
+            border: "1px solid #d0d0d0",
+            background: "#f1f5f9",
+            flex: 1
+          }}
         />
 
+        {/* GWP */}
         <input
           type="number"
-          step="any"
           placeholder="GWP"
           value={row.gwp}
           onChange={(e) => setRow({ ...row, gwp: e.target.value })}
+          style={{
+            padding: "10px 15px",
+            borderRadius: 8,
+            border: "1px solid #d0d0d0",
+            background: "#f1f5f9",
+            flex: 1
+          }}
         />
 
-        <button type="submit">Ajouter</button>
+        {/* Ajouter */}
+        <button
+          type="submit"
+          style={{
+            background: "#00994C",
+            padding: "10px 20px",
+            borderRadius: 8,
+            border: "none",
+            color: "white",
+            fontWeight: "bold",
+            cursor: "pointer"
+          }}
+        >
+          Ajouter
+        </button>
       </form>
 
-      <table className="table-pro" style={{ marginTop: 12 }}>
+      {/* TABLEAU */}
+      <table
+        style={{
+          width: "100%",
+          borderCollapse: "collapse",
+          boxShadow: "0 2px 6px rgba(0,0,0,0.1)",
+          borderRadius: 10,
+          overflow: "hidden"
+        }}
+      >
         <thead>
-          <tr>
-            <th>Type</th>
-            <th>Quantité (kg)</th>
-            <th>GWP</th>
-            <th>Émissions (kgCO₂e)</th>
-            <th></th>
+          <tr
+            style={{
+              background: "linear-gradient(90deg, #003B73, #0056A6)",
+              color: "white",
+              textAlign: "left"
+            }}
+          >
+            <th style={{ padding: 12 }}>TYPE</th>
+            <th style={{ padding: 12 }}>QUANTITÉ (KG)</th>
+            <th style={{ padding: 12 }}>GWP</th>
+            <th style={{ padding: 12 }}>TOTAL (KGCO₂E)</th>
+            <th style={{ padding: 12 }}></th>
           </tr>
         </thead>
 
         <tbody>
           {items.length === 0 ? (
             <tr>
-              <td colSpan={5} className="muted">Aucune ligne pour l’instant.</td>
+              <td colSpan={5} style={{ textAlign: "center", padding: 20 }}>
+                Aucune donnée pour l’instant.
+              </td>
             </tr>
           ) : (
             items.map((it, i) => (
-              <tr key={i}>
-                <td>{it.type}</td>
-                <td>{it.quantite}</td>
-                <td>{it.gwp}</td>
-                <td>{it.emission.toFixed(2)}</td>
-                <td>
-                  <button className="btn-danger" onClick={() => removeItem(i)}>
+              <tr key={i} style={{ background: i % 2 === 0 ? "#ffffff" : "#f8f8f8" }}>
+                <td style={{ padding: 12 }}>{it.type}</td>
+                <td style={{ padding: 12 }}>{it.quantite}</td>
+                <td style={{ padding: 12 }}>{it.gwp}</td>
+                <td style={{ padding: 12 }}>{it.emission.toFixed(2)}</td>
+                <td style={{ padding: 12 }}>
+                  <button
+                    onClick={() => removeItem(i)}
+                    style={{
+                      background: "#C62828",
+                      color: "white",
+                      border: "none",
+                      padding: "6px 12px",
+                      borderRadius: 6,
+                      cursor: "pointer"
+                    }}
+                  >
                     Supprimer
                   </button>
                 </td>
@@ -139,23 +196,55 @@ export default function StepRefroidissement({ data, setData, onNext, onPrev }) {
             ))
           )}
         </tbody>
-
-        {items.length > 0 && (
-          <tfoot>
-            <tr className="total-row">
-              <td colSpan={3}><strong>Total étape</strong></td>
-              <td><strong>{totalSection.toFixed(2)}</strong></td>
-              <td></td>
-            </tr>
-          </tfoot>
-        )}
       </table>
 
-      <div className="actions" style={{ marginTop: 10 }}>
-        <button className="secondary" onClick={onPrev}>Précédent</button>
-        <button onClick={onNext}>Suivant</button>
+      {/* FOOTER BUTTONS */}
+      <div style={{ display: "flex", gap: 10, marginTop: 20 }}>
+        <button
+          onClick={onPrev}
+          style={{
+            background: "#00994C",
+            color: "white",
+            padding: "10px 18px",
+            borderRadius: 8,
+            border: "none",
+            cursor: "pointer",
+            fontWeight: "bold"
+          }}
+        >
+          Précédent
+        </button>
+
+        <button
+          onClick={onNext}
+          style={{
+            background: "#00994C",
+            color: "white",
+            padding: "10px 18px",
+            borderRadius: 8,
+            border: "none",
+            cursor: "pointer",
+            fontWeight: "bold"
+          }}
+        >
+          Suivant
+        </button>
+
         {items.length > 0 && (
-          <button className="btn-danger" onClick={removeAll}>Supprimer tout</button>
+          <button
+            onClick={removeAll}
+            style={{
+              background: "#C62828",
+              color: "white",
+              padding: "10px 18px",
+              borderRadius: 8,
+              border: "none",
+              cursor: "pointer",
+              fontWeight: "bold"
+            }}
+          >
+            Supprimer tout
+          </button>
         )}
       </div>
     </div>

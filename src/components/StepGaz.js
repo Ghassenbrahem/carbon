@@ -2,8 +2,9 @@ import React, { useState } from "react";
 import facteurs from "../data/facteurs.json";
 import TotalBar from "./TotalBar";
 
-export default function StepTransport({ data, setData, onNext, onPrev, grandTotal }) {
+export default function StepGaz({ data, setData, onNext, onPrev, grandTotal }) {
   const [quantite, setQuantite] = useState("");
+
   const items = data.gaz || [];
 
   const handleAdd = (e) => {
@@ -12,15 +13,22 @@ export default function StepTransport({ data, setData, onNext, onPrev, grandTota
 
     const q = parseFloat(quantite);
 
-    // facteur 2447 kgCO2 / Tep
+    // facteur gaz (kgCO₂ / Tep)
     const facteur = facteurs.gaz.Tep;
 
-    // Convertir en tonnes
-    const emission = (q * facteur) ;
+    // kgCO₂
+    const emission = q * facteur;
 
     setData({
       ...data,
-      gaz: [...items, { nom: "Gaz", quantite: q, emission }]
+      gaz: [
+        ...items,
+        {
+          nom: "Gaz",
+          valeur: q,       // <-- IMPORTANT : calc lit 'valeur'
+          emission: emission
+        }
+      ]
     });
 
     setQuantite("");
@@ -59,7 +67,7 @@ export default function StepTransport({ data, setData, onNext, onPrev, grandTota
       <ul className="data-list">
         {items.map((g, i) => (
           <li key={i} className="row-actions">
-            <span>{g.nom} — {g.quantite} Tep</span>
+            <span>{g.nom} — {g.valeur} Tep</span>
             <span className="muted">{formatEmission(g.emission)} KgCO₂e</span>
             <button className="btn-danger" onClick={() => removeItem(i)}>
               Supprimer

@@ -24,7 +24,7 @@ const steps = [
   { id: "electricite", label: "Électricité", component: StepElectricite },
   { id: "eaudouce", label: "Eau ", component: StepEauDouce },
   { id: "gaz", label: "Gaz", component: StepGaz },
-  { id: "eaux", label: "Eau de décharge", component: StepEaux },
+  { id: "eau", label: "Eau de décharge", component: StepEaux },
   { id: "distribution", label: "Distribution", component: StepDistribution },
   { id: "dechets", label: "Déchets", component: StepDechets },
   { id: "refroidissement", label: "Refroidissement", component: StepRefroidissement },

@@ -75,7 +75,7 @@ export default function StepDistribution({ data, setData, onNext, onPrev }) {
         <input
           type="number"
           step="any"
-          placeholder="Quantité (t)"
+          placeholder="Quantité (kg)"
           value={quantite}
           onChange={(e) => setQuantite(e.target.value)}
         />
@@ -93,7 +93,7 @@ export default function StepDistribution({ data, setData, onNext, onPrev }) {
         <input
           type="number"
           step="any"
-          placeholder="Facteur (tCO₂e/t·km)"
+          placeholder="Facteur (KgCO₂e/t·km)"
           value={facteur}
           onChange={(e) => setFacteur(e.target.value)}
         />

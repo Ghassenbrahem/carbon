@@ -6,9 +6,10 @@ export default function StepMatiere({ data, setData, onNext, onPrev }) {
   const [quantite, setQuantite] = useState("");
   const [facteur, setFacteur] = useState("");
 
-  const matieres = data.matieres || [];
+  // ⚠️ Correction principale : utiliser data.matiere (sans S)
+  const matieres = data.matiere || [];
 
-  // ✅ Ta liste officielle avec facteurs
+  // Liste avec facteurs
   const listeMatieres = [
     { nom: "Caoutchouc naturel", facteur: 1.38 },
     { nom: "Caoutchouc synthétique", facteur: 2.55 },
@@ -16,34 +17,32 @@ export default function StepMatiere({ data, setData, onNext, onPrev }) {
     { nom: "Fils métalique", facteur: 2.39 },
     { nom: "Fils d'acier", facteur: 2.39 },
     { nom: "Plastifiant", facteur: 3.71 },
-    { nom: "Silice", facteur: 5.00 },
+    { nom: "Silice", facteur: 5.0 },
     { nom: "Activant", facteur: 3.68 },
     { nom: "Vulcanissant", facteur: 0.18 },
-    { nom: "Liant", facteur: 2.90 },
+    { nom: "Liant", facteur: 2.9 },
     { nom: "Antioxydant", facteur: 3.75 }
   ];
 
-  // Quand on choisit une matière dans le select
   const handleSelectMatiere = (value) => {
     setNom(value);
     const selected = listeMatieres.find((m) => m.nom === value);
-    if (selected) {
-      setFacteur(selected.facteur);
-    }
+    setFacteur(selected ? selected.facteur : "");
   };
 
   const ajouterMatiere = () => {
     if (!nom || !quantite || !facteur) return;
 
+    const q = parseFloat(quantite);
+    const f = parseFloat(facteur);
+    const emission = q * f;
+
     setData((prev) => ({
       ...prev,
-      matieres: [
-        ...(prev.matieres || []),
-        {
-          nom,
-          quantite: parseFloat(quantite),
-          facteur: parseFloat(facteur)
-        }
+      // ⚠️ Correction : enregistrement dans "matiere"
+      matiere: [
+        ...(prev.matiere || []),
+        { nom, quantite: q, facteur: f, emission }
       ]
     }));
 
@@ -55,17 +54,15 @@ export default function StepMatiere({ data, setData, onNext, onPrev }) {
   const supprimerTout = () => {
     setData((prev) => ({
       ...prev,
-      matieres: [],
+      matiere: [],
       total_matieres: 0
     }));
   };
 
-  // ✅ Recalcul automatique du total matières et stockage dans data.total_matieres
+  // Recalcul total
   useEffect(() => {
-    const total = matieres.reduce(
-      (sum, m) => sum + m.quantite * m.facteur,
-      0
-    );
+    const total = (matieres || [])
+      .reduce((sum, m) => sum + Number(m.emission || 0), 0);
 
     setData((prev) => ({
       ...prev,
@@ -77,20 +74,13 @@ export default function StepMatiere({ data, setData, onNext, onPrev }) {
     <div>
       <h2>Matières premières</h2>
 
-      {/* Sélecteur de matière */}
-      <select
-        value={nom}
-        onChange={(e) => handleSelectMatiere(e.target.value)}
-      >
+      <select value={nom} onChange={(e) => handleSelectMatiere(e.target.value)}>
         <option value="">Sélectionner une matière</option>
         {listeMatieres.map((m, i) => (
-          <option key={i} value={m.nom}>
-            {m.nom}
-          </option>
+          <option key={i} value={m.nom}>{m.nom}</option>
         ))}
       </select>
 
-      {/* Quantité */}
       <input
         type="number"
         placeholder="Quantité (Kg)"
@@ -98,7 +88,6 @@ export default function StepMatiere({ data, setData, onNext, onPrev }) {
         onChange={(e) => setQuantite(e.target.value)}
       />
 
-      {/* Facteur auto-rempli mais modifiable */}
       <input
         type="number"
         placeholder="Facteur"
@@ -108,7 +97,6 @@ export default function StepMatiere({ data, setData, onNext, onPrev }) {
 
       <button onClick={ajouterMatiere}>Ajouter</button>
 
-      {/* Tableau des matières */}
       {matieres.length === 0 ? (
         <p>Aucune matière pour l'instant.</p>
       ) : (
@@ -118,7 +106,7 @@ export default function StepMatiere({ data, setData, onNext, onPrev }) {
               <th>NOM</th>
               <th>QUANTITÉ (KG)</th>
               <th>FACTEUR</th>
-              <th>TOTAL (TCO₂E)</th>
+              <th>TOTAL (KgCO₂E)</th>
             </tr>
           </thead>
           <tbody>
@@ -127,7 +115,7 @@ export default function StepMatiere({ data, setData, onNext, onPrev }) {
                 <td>{m.nom}</td>
                 <td>{m.quantite}</td>
                 <td>{m.facteur}</td>
-                <td>{(m.quantite * m.facteur).toFixed(2)}</td>
+                <td>{m.emission.toFixed(2)}</td>
               </tr>
             ))}
           </tbody>

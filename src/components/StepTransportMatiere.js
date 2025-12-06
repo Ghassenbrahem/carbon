@@ -6,62 +6,64 @@ export default function StepTransportMatiere({ data, setData, onNext, onPrev }) 
     nom: "",
     masse: "",
     pays: "",
-    mode: "routier",
-    distance: "",
-    facteur: "",
+    type: "routier",       // 🔥 CORRECTION : computeTotals lit "type"
+    distance: ""
   });
 
-  // Liste existante
   const items = data.transportMatiere || [];
 
   const handleAdd = (e) => {
     e.preventDefault();
-    if (!row.nom || !row.masse || !row.distance || !row.mode) return;
 
-    const masse = parseFloat(row.masse);
+    if (!row.nom || !row.masse || !row.distance) return;
+
+    const masseKg = parseFloat(row.masse);
+    const masseT = masseKg / 1000;   // 🔥 conversion kg → tonnes
+
     const distance = parseFloat(row.distance);
-    const facteur = facteurs.transportMatiere[row.mode] || 0;
+    const facteur = facteurs.transportMatiere[row.type] || 0;
 
-    const emission = masse * distance * facteur;
+    const emission = masseT * distance * facteur;  // 🔥 bonne formule
 
-    setData((prev) => ({
+    setData(prev => ({
       ...prev,
       transportMatiere: [
         ...(prev.transportMatiere || []),
         {
-          ...row,
-          masse,
+          nom: row.nom,
+          pays: row.pays,
+          masse: masseKg,     // on stocke en kg pour l’affichage
+          masseT,             // utilisé pour les calculs
+          type: row.type,     // 🔥 computeTotals lit "type"
           distance,
           facteur,
-          emission,
-        },
-      ],
+          emission
+        }
+      ]
     }));
 
+    // reset
     setRow({
       nom: "",
       masse: "",
       pays: "",
-      mode: "routier",
-      distance: "",
-      facteur: "",
+      type: "routier",
+      distance: ""
     });
   };
 
   const removeItem = (i) => {
-    setData((prev) => {
-      const updated = [...(prev.transportMatiere || [])];
-      updated.splice(i, 1);
-      return { ...prev, transportMatiere: updated };
-    });
+    const updated = [...items];
+    updated.splice(i, 1);
+    setData({ ...data, transportMatiere: updated });
   };
 
   return (
     <div className="step-card">
       <h2>Transport Matières Premières</h2>
 
-      {/* Formulaire */}
       <form onSubmit={handleAdd} className="grid-form" style={{ gap: 8 }}>
+        
         <input
           type="text"
           placeholder="Matière"
@@ -72,7 +74,7 @@ export default function StepTransportMatiere({ data, setData, onNext, onPrev }) 
         <input
           type="number"
           step="any"
-          placeholder="Masse transportée (T)"
+          placeholder="Masse (kg)"
           value={row.masse}
           onChange={(e) => setRow({ ...row, masse: e.target.value })}
         />
@@ -93,8 +95,8 @@ export default function StepTransportMatiere({ data, setData, onNext, onPrev }) 
         />
 
         <select
-          value={row.mode}
-          onChange={(e) => setRow({ ...row, mode: e.target.value })}
+          value={row.type}
+          onChange={(e) => setRow({ ...row, type: e.target.value })}
         >
           <option value="routier">Routier</option>
           <option value="maritime">Maritime</option>
@@ -105,13 +107,11 @@ export default function StepTransportMatiere({ data, setData, onNext, onPrev }) 
         <button type="submit">Ajouter</button>
       </form>
 
-      {/* Tableau */}
       <table className="data-table" style={{ marginTop: 14 }}>
         <thead>
           <tr>
             <th>Matière première</th>
             <th>Masse (kg)</th>
-            <th>Pays</th>
             <th>Mode</th>
             <th>Distance (km)</th>
             <th>Facteur (kgCO₂e/t.km)</th>
@@ -126,8 +126,7 @@ export default function StepTransportMatiere({ data, setData, onNext, onPrev }) 
               <tr key={i}>
                 <td>{item.nom}</td>
                 <td>{item.masse}</td>
-                <td>{item.pays}</td>
-                <td>{item.mode}</td>
+                <td>{item.type}</td>
                 <td>{item.distance}</td>
                 <td>{item.facteur}</td>
                 <td>{item.emission.toFixed(3)}</td>
@@ -140,19 +139,14 @@ export default function StepTransportMatiere({ data, setData, onNext, onPrev }) 
             ))
           ) : (
             <tr>
-              <td colSpan="8" className="muted">
-                Aucun transport enregistré
-              </td>
+              <td colSpan="7" className="muted">Aucun transport enregistré</td>
             </tr>
           )}
         </tbody>
       </table>
 
-      {/* Navigation */}
       <div className="actions">
-        <button className="secondary" onClick={onPrev}>
-          Précédent
-        </button>
+        <button className="secondary" onClick={onPrev}>Précédent</button>
         <button onClick={onNext}>Suivant</button>
       </div>
     </div>

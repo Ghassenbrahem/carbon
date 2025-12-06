@@ -5,38 +5,37 @@ import TotalBar from "./TotalBar";
 export default function StepEauDouce({ data, setData, onNext, onPrev, grandTotal }) {
   const [quantite, setQuantite] = useState("");
 
-  // liste des lignes eau douce
+  // Liste eau douce stockée dans data.eaudouce
   const items = data.eaudouce || [];
 
-  // Ajouter une ligne
   const handleAdd = (e) => {
     e.preventDefault();
     if (!quantite) return;
 
     const q = parseFloat(quantite);
 
-    const facteur = facteurs?.eau?.m3 || 0; // facteur correct
+    // 🔥 Correction : lecture du bon facteur
+    const facteur = facteurs?.eaudouce?.m3 || 0;
 
     const emission = q * facteur; // kgCO2e
 
     const newItem = {
       nom: "Eau douce",
       quantite: q,
-      emission, // valeur déjà en kgCO2e
+      facteur,
+      emission,
     };
 
     setData({ ...data, eaudouce: [...items, newItem] });
     setQuantite("");
   };
 
-  // Supprimer une ligne
   const removeItem = (i) => {
     const updated = [...items];
     updated.splice(i, 1);
     setData({ ...data, eaudouce: updated });
   };
 
-  // Supprimer toutes les lignes
   const removeAll = () => {
     if (window.confirm("Supprimer toutes les lignes d’eau douce ?")) {
       setData({ ...data, eaudouce: [] });
@@ -65,8 +64,9 @@ export default function StepEauDouce({ data, setData, onNext, onPrev, grandTotal
               {e.nom} — {e.quantite} m³
             </span>
 
-            {/* Convertir kg → tonnes : /1000 */}
-            <span className="muted">{(e.emission ).toFixed(3)} tCO₂e</span>
+            <span className="muted">
+              {e.emission.toFixed(3)} KgCO₂e
+            </span>
 
             <button className="btn-danger" onClick={() => removeItem(i)}>
               Supprimer
@@ -74,9 +74,7 @@ export default function StepEauDouce({ data, setData, onNext, onPrev, grandTotal
           </li>
         ))}
 
-        {items.length === 0 && (
-          <li className="muted">Aucune ligne pour l’instant.</li>
-        )}
+        {items.length === 0 && <li className="muted">Aucune ligne pour l’instant.</li>}
       </ul>
 
       <div className="actions">
@@ -89,10 +87,6 @@ export default function StepEauDouce({ data, setData, onNext, onPrev, grandTotal
         total={grandTotal}
         max={200}
         year={data?.general?.annee}
-        onDetails={() => {
-          const el = document.getElementById("rapport-detaille");
-          if (el) el.scrollIntoView({ behavior: "smooth" });
-        }}
       />
     </div>
   );

@@ -4,21 +4,24 @@ import TotalBar from "./TotalBar";
 
 export default function StepEauDecharge({ data, setData, onNext, onPrev, grandTotal }) {
   const [quantite, setQuantite] = useState("");
-  const [type, setType] = useState("Step"); // valeur par défaut
+  const [type, setType] = useState("Step");
 
-  // ⚠️ IMPORTANT : data.eau (et pas eaudouce)
-  const items = data.eau || [];
+  // ⚠️ Correction ici : utiliser data.eaux (et non data.eau)
+  const items = data.eaux || [];
 
   const handleAdd = (e) => {
     e.preventDefault();
     if (!quantite) return;
 
-    const facteur = facteurs.eau[type] || 0;
-    const emission = parseFloat(quantite) * facteur;
+    const q = parseFloat(quantite);
+    const facteur = facteurs?.eau?.[type] || 0;
+
+    const emission = q * facteur;
 
     setData({
       ...data,
-      eau: [...items, { nom: type, quantite, facteur, emission }]
+      // ⚠️ Correction ici aussi
+      eaux: [...items, { nom: type, quantite: q, facteur, emission }]
     });
 
     setQuantite("");
@@ -28,15 +31,14 @@ export default function StepEauDecharge({ data, setData, onNext, onPrev, grandTo
     const updated = [...items];
     updated.splice(i, 1);
 
-    setData({
-      ...data,
-      eau: updated
-    });
+    // ⚠️ Correction
+    setData({ ...data, eaux: updated });
   };
 
   const removeAll = () => {
     if (window.confirm("Supprimer toutes les lignes d’eau ?")) {
-      setData({ ...data, eau: [] });
+      // ⚠️ Correction
+      setData({ ...data, eaux: [] });
     }
   };
 
@@ -45,16 +47,12 @@ export default function StepEauDecharge({ data, setData, onNext, onPrev, grandTo
       <h2>Eau de décharge</h2>
 
       <form onSubmit={handleAdd}>
-        {/* Choix du type (Step) */}
         <select value={type} onChange={(e) => setType(e.target.value)}>
           {Object.keys(facteurs.eau).map((t, i) => (
-            <option key={i} value={t}>
-              {t}
-            </option>
+            <option key={i} value={t}>{t}</option>
           ))}
         </select>
 
-        {/* Quantité */}
         <input
           type="number"
           step="any"
@@ -66,13 +64,11 @@ export default function StepEauDecharge({ data, setData, onNext, onPrev, grandTo
         <button type="submit">Ajouter</button>
       </form>
 
-      {/* Liste des entrées */}
       <ul className="data-list">
         {items.map((e, i) => (
           <li key={i} className="row-actions">
             <span>
-              {e.nom} — {e.quantite} m³ × {e.facteur} ={" "}
-              {Number(e.emission).toFixed(3)} kgCO₂e
+              {e.nom} — {e.quantite} m³ × {e.facteur} = {e.emission.toFixed(3)} KgCO₂e
             </span>
             <button className="btn-danger" onClick={() => removeItem(i)}>
               Supprimer
@@ -80,9 +76,7 @@ export default function StepEauDecharge({ data, setData, onNext, onPrev, grandTo
           </li>
         ))}
 
-        {items.length === 0 && (
-          <li className="muted">Aucune ligne pour l’instant.</li>
-        )}
+        {items.length === 0 && <li className="muted">Aucune ligne pour l’instant.</li>}
       </ul>
 
       <div className="actions">
@@ -95,10 +89,6 @@ export default function StepEauDecharge({ data, setData, onNext, onPrev, grandTo
         total={grandTotal}
         max={200}
         year={data?.general?.annee}
-        onDetails={() => {
-          const el = document.getElementById("rapport-detaille");
-          if (el) el.scrollIntoView({ behavior: "smooth" });
-        }}
       />
     </div>
   );

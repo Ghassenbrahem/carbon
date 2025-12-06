@@ -2,21 +2,38 @@ import React, { useState } from "react";
 import facteurs from "../data/facteurs.json";
 import TotalBar from "./TotalBar";
 
-
-export default function StepTransport({ data, setData, onNext, onPrev, grandTotal }) {
+export default function StepElectricite({ data, setData, onNext, onPrev, grandTotal }) {
   const [quantite, setQuantite] = useState("");
+
   const items = data.electricite || [];
 
   const handleAdd = (e) => {
     e.preventDefault();
     if (!quantite) return;
-    const emission = parseFloat(quantite) * (facteurs.electricite["kWh"] || 0);
-    setData({ ...data, electricite: [...items, { nom: "Électricité", quantite, emission }] });
+
+    const q = parseFloat(quantite);
+    const facteur = facteurs.electricite.kWh || 0;
+
+    const emission = q * facteur;
+
+    setData({
+      ...data,
+      electricite: [
+        ...items,
+        {
+          nom: "Électricité",
+          valeur: q,          // <-- IMPORTANT : computeTotals lit 'valeur'
+          emission: emission  // kgCO₂e
+        }
+      ]
+    });
+
     setQuantite("");
   };
 
   const removeItem = (i) => {
-    const updated = [...items]; updated.splice(i,1);
+    const updated = [...items];
+    updated.splice(i, 1);
     setData({ ...data, electricite: updated });
   };
 
@@ -31,19 +48,26 @@ export default function StepTransport({ data, setData, onNext, onPrev, grandTota
       <h2>Électricité</h2>
 
       <form onSubmit={handleAdd}>
-        <input type="number" step="any" placeholder="Quantité (kWh)" value={quantite} onChange={(e)=>setQuantite(e.target.value)} />
+        <input
+          type="number"
+          step="any"
+          placeholder="Quantité (kWh)"
+          value={quantite}
+          onChange={(e) => setQuantite(e.target.value)}
+        />
         <button type="submit">Ajouter</button>
       </form>
 
       <ul className="data-list">
-        {items.map((e,i)=>(
+        {items.map((e, i) => (
           <li key={i} className="row-actions">
-            <span>{e.nom} — {e.quantite} kWh</span>
-            <span className="muted">{Number(e.emission).toFixed(2)} kgCO₂e/Kwh</span>
-            <button className="btn-danger" onClick={()=>removeItem(i)}>Supprimer</button>
+            <span>{e.nom} — {e.valeur} kWh</span>
+            <span className="muted">{Number(e.emission).toFixed(2)} kgCO₂e</span>
+            <button className="btn-danger" onClick={() => removeItem(i)}>Supprimer</button>
           </li>
         ))}
-        {items.length===0 && <li className="muted">Aucune ligne pour l’instant.</li>}
+
+        {items.length === 0 && <li className="muted">Aucune ligne pour l’instant.</li>}
       </ul>
 
       <div className="actions">
@@ -51,16 +75,16 @@ export default function StepTransport({ data, setData, onNext, onPrev, grandTota
         <button onClick={onNext}>Suivant</button>
         <button className="btn-danger" onClick={removeAll}>Supprimer tout</button>
       </div>
-       {/* Barre totale sous les boutons */}
-            <TotalBar
-              total={grandTotal}             // total général
-              max={200}                      // ajuste l’échelle/objectif si besoin
-              year={data?.general?.annee}
-              onDetails={() => {
-                const el = document.getElementById("rapport-detaille");
-                if (el) el.scrollIntoView({ behavior: "smooth" });
-              }}
-            />
+
+      <TotalBar
+        total={grandTotal}
+        max={200}
+        year={data?.general?.annee}
+        onDetails={() => {
+          const el = document.getElementById("rapport-detaille");
+          if (el) el.scrollIntoView({ behavior: "smooth" });
+        }}
+      />
     </div>
   );
 }
